@@ -1,0 +1,9 @@
+node_modules
+.husky
+.git
+.gitignore
+
+spec
+lib
+.eslintrc
+tsconfig.json
