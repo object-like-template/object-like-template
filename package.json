@@ -1,0 +1,30 @@
+{
+  "name": "object-like-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "**/*.ts" : [
+      "eslint --fix"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/object-like-template/object-like-template.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/object-like-template/object-like-template/issues"
+  },
+  "homepage": "https://github.com/object-like-template/object-like-template#readme",
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.5"
+  }
+}
