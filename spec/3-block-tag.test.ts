@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import render from '../lib/render';
 
-describe('Block tags', () => {
+describe('block tags', () => {
   it('should not tag before "{" until "}', () => {
     const template = 'body: {\n  section: article, article \n  section: article}';
     const result = render(template);
