@@ -8,9 +8,9 @@ describe('parent and child', () => {
     const result = render(template);
 
     expect(result).to.equal(
-      `<html>
-  <head></head>
-</html>`,
+      '<html>'
+        + '<head></head>'
+      + '</html>',
     );
   });
 
@@ -19,9 +19,9 @@ describe('parent and child', () => {
     const result = render(template);
 
     expect(result).to.equal(
-      `<html>
-  <head></head>
-</html>`,
+      '<html>'
+        + '<head></head>'
+      + '</html>',
     );
   });
 
@@ -45,10 +45,12 @@ describe('parent and children', () => {
     const result = render(template);
 
     expect(result).to.equal(
-      `<html>
-  <head></head>
-  <body></body>
-</html>`,
+      '<html>'
+        + '<head>'
+        + '</head>'
+        + '<body>'
+        + '</body>'
+      + '</html>',
     );
   });
 
@@ -57,10 +59,10 @@ describe('parent and children', () => {
     const result = render(template);
 
     expect(result).to.equal(
-      `<html>
-  <head></head>
-  <body></body>
-</html>`,
+      '<html>'
+        + '<head></head>'
+        + '<body></body>'
+      + '</html>',
     );
   });
 });

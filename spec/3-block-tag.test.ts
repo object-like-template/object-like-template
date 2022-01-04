@@ -8,15 +8,15 @@ describe('block tags', () => {
     const result = render(template);
 
     expect(result).to.equal(
-      `<body>
-  <section>
-    <article></article>
-    <article></article>
-  </section>
-  <section>
-    <article></article>
-  </section>
-</body>`,
+      '<body>'
+        + '<section>'
+          + '<article></article>'
+          + '<article></article>'
+        + '</section>'
+        + '<section>'
+          + '<article></article>'
+        + '</section>'
+      + '</body>',
     );
   });
 
