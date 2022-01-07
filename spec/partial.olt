@@ -1,0 +1,5 @@
+!DOCTYPE(html)
+html : {
+  head: title: boo!
+  body: section: article: h1: "This is partial template"
+}
