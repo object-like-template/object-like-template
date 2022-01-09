@@ -1,7 +1,9 @@
+import convert from './convert';
+
 type Options = {
-  [key in string]: string
+  [key in string]: string | Options
 }
 
 export default function render(template: string, options?: Options): string {
-  return template;
+  return convert(template);
 }
