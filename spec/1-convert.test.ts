@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import convert from '../lib/convert';
+import { convert } from '../lib/convert';
 
 describe('single tag without property', () => {
   it('should close a tag when meet line-break without any mark', () => {
@@ -14,7 +14,7 @@ describe('single tag without property', () => {
     const template = 'input\n';
     const result = convert(template);
 
-    expect(result).to.equal('<input>');
+    expect(result).to.equal('<input />');
   });
 
   it('should convert a tag with a property', () => {
@@ -28,24 +28,24 @@ describe('single tag without property', () => {
     const template = 'div(style="display: flex; background-color: black;", class="black")\n';
     const result = convert(template);
 
-    expect(result).to.equal('<div style="display: flex; background-color: black;", class="black"></div>');
+    expect(result).to.equal('<div style="display: flex; background-color: black;" class="black"></div>');
   });
 
   it('should convert a singleton with property', () => {
-    const template = '!DOCTYPE(html)\n';
+    const template = 'input(type="text")\n';
     const result = convert(template);
 
-    expect(result).to.equal('<!DOCTYPE html>');
+    expect(result).to.equal('<input type="text" />');
   });
 
   it('should throw Syntax Error when properties options is not closed', () => {
-    const template = '!DOCTYPE(html';
+    const template = 'input(type="ko"\n';
 
-    expect(convert(template)).to.throw(SyntaxError, 'Unclosed Options');
+    expect(() => convert(template)).to.throw(SyntaxError, 'Unclosed Options');
   });
 });
 
-describe('parent and child', () => {
+describe('multiple tags', () => {
   it('should convert a tag with a child with line-break', () => {
     const template = 'html:\n  head\n';
     const result = convert(template);
@@ -78,7 +78,7 @@ describe('parent and child', () => {
   it('should throw error when text is not closed', () => {
     const template = 'h1: "this is title';
 
-    expect(convert(template)).to.throw(SyntaxError, 'Text have to be in double quotes');
+    expect(() => convert(template)).to.throw(SyntaxError, 'Text has to be in double quotes');
   });
 
   it('should convert parent and children with line-break', () => {
@@ -129,7 +129,7 @@ describe('block tags', () => {
   it('should throw syntax error when block is not closed', () => {
     const template = 'body: {\n  section: article \n  section: article';
 
-    expect(convert(template)).to.throw(SyntaxError, 'Unclosed Block (need “}”)');
+    expect(() => convert(template)).to.throw(SyntaxError, 'Unclosed Block (need “}”)');
   });
 });
 
@@ -158,25 +158,25 @@ describe('options', () => {
   it('should throw a syntax error when not close variable block', () => {
     const template = 'h1(class=@{className)\n';
 
-    expect(convert(template, { className: 'red-line' })).to.throw(SyntaxError, 'Unclosed variable');
+    expect(() => convert(template, { className: 'red-line' })).to.throw(SyntaxError, 'Unclosed variable');
   });
 
   it('should convert a tag with default variable', () => {
     const template = 'h1: @{title = "title"}\n';
     const result = convert(template);
 
-    expect(convert(result)).to.equal('<h1>title</h1>');
+    expect(() => convert(result)).to.equal('<h1>title</h1>');
   });
 
   it('should throw a reference error when use variable without options', () => {
     const template = 'h1(class=@{className})\n';
 
-    expect(convert(template)).to.throw(ReferenceError, 'options is required');
+    expect(() => convert(template)).to.throw(ReferenceError, 'options is required');
   });
 
   it('should throw a reference error when use undefined variable', () => {
     const template = 'h1(class=@{className})\n';
 
-    expect(convert(template, { class: 'red-line' })).to.throw(ReferenceError, '"className" is undefined');
+    expect(() => convert(template, { class: 'red-line' })).to.throw(ReferenceError, '"className" is undefined');
   });
 });

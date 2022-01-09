@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import render from '../lib/render';
 
-describe('basic template', () => {
+describe.skip('basic template', () => {
   it('should render a basic template', () => {
     const templatePath = '../views/basic.olt';
     const result = render(templatePath);
@@ -30,7 +30,7 @@ describe('basic template', () => {
   });
 });
 
-describe('template including options', () => {
+describe.skip('template including options', () => {
   it('should render a template including options', () => {
     const templatePath = '../views/includeOption.olt';
     const result = render(templatePath, { title: 'This is basic template' });
@@ -53,7 +53,7 @@ describe('template including options', () => {
   });
 });
 
-describe('template including partial template', () => {
+describe.skip('template including partial template', () => {
   it('should render a template including partial template', () => {
     const templatePath = '../views/includePartial';
     const result = render(templatePath);
@@ -105,7 +105,7 @@ describe('template including partial template', () => {
   });
 });
 
-describe('template including options and partial template', () => {
+describe.skip('template including options and partial template', () => {
   it('should render a template including nested options', () => {
     const templatePath = '../views/includeOption.olt';
     const result = render(templatePath, { article: { title: 'partial', content: 'This is an article about partial.' } });
