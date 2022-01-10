@@ -109,7 +109,7 @@ describe('multiple tags', () => {
 });
 
 describe('block tags', () => {
-  it('should not tag before "{" until "}', () => {
+  it('should not close tag before "{" until "}', () => {
     const template = 'body: {\n  section: article, article \n  section: article}';
     const result = convert(template);
 
