@@ -28,6 +28,7 @@
         "ts": "never"
       }
     ],
-    "linebreak-style": "off"
+    "linebreak-style": "off",
+    "no-shadow": "off"
   }
 }
