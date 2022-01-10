@@ -29,6 +29,8 @@
       }
     ],
     "linebreak-style": "off",
-    "no-shadow": "off"
+    "no-shadow": "off",
+    "no-template-curly-in-string": "off",
+    "no-continue": "off",
   }
 }

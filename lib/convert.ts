@@ -24,6 +24,8 @@ export function convert(template: string, options?: Options): string {
     inBlockTags: [],
   };
   let attribute: Attribute = ['', ''];
+  let isKey = false;
+  let hasDefault = false;
   let currentStr = '';
   let result = '';
 
@@ -219,8 +221,61 @@ export function convert(template: string, options?: Options): string {
     }
   }
 
+  let count = 0;
+  let key = '';
+  let defaultValue = '';
+
+  function handleKey(char: string) {
+    if (char === '=') {
+      hasDefault = true;
+      count = 0;
+
+      return;
+    }
+
+    if (hasDefault) {
+      if (char === '"') {
+        count += 1;
+        hasDefault = count < 2;
+      } else if (char !== ' ') {
+        defaultValue += char;
+      }
+
+      return;
+    }
+
+    if (char === '"' || char === ')') {
+      throw new SyntaxError('Unclosed variable');
+    }
+
+    if (char === '}') {
+      isKey = false;
+
+      const value = options?.[key] || defaultValue;
+
+      if (value) {
+        currentStr += value;
+      }
+
+      key = '';
+    } else {
+      key += char;
+    }
+  }
+
   for (let i = 0, len = template.length; i < len; i += 1) {
     const char = template[i];
+
+    if (char === '@' && template[i + 1] === '{') {
+      isKey = true;
+      i += 1;
+      continue;
+    }
+
+    if (isKey) {
+      handleKey(char);
+      continue;
+    }
 
     if (state === STATE.IS_TAG_NAME) {
       handleTagName(char, template[i - 1] ? template[i - 1] : template[i - 2]);
