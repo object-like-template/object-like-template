@@ -5,6 +5,6 @@
     "target": "esnext",
     "declaration": true,
     "outDir": "/dist",
-    "strict": true,
+    "strict": true
   }
 }
