@@ -5,18 +5,21 @@ export interface Options {
   [key: string]: string | Options,
 }
 
+export type Partial = [string, string];
+
 type Attribute = [string, string];
 
 interface Tag {
   name: string,
   attributes: Attribute[],
   inBlockTags: Tag[],
+  template?: string,
 }
 
-export function convert(template: string, options?: Options): string {
-  const unClosedTags: Tag[] = [];
+export function convert(template: string, options?: Options, partials?: Partial[]): string {
   const blockTags: Tag[] = [];
 
+  let unClosedTags: Tag[] = [];
   let state: string = STATE.IS_TAG_NAME;
   let tag: Tag = {
     name: '',
@@ -63,7 +66,10 @@ export function convert(template: string, options?: Options): string {
     const attributesStr = attributes.map(([name, value]) => `${name}="${value}"`).join(' ');
     const currentBlockTag = blockTags[blockTags.length - 1];
 
-    if (singletons.has(name)) {
+    if (tag.template) {
+      const options = attributes.reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+      result += convert(tag.template, options);
+    } else if (singletons.has(name)) {
       result += attributesStr ? `<${name} ${attributesStr} />` : `<${name} />`;
     } else {
       result += attributesStr ? `<${name} ${attributesStr}>` : `<${name}>`;
@@ -93,6 +99,8 @@ export function convert(template: string, options?: Options): string {
 
     if (blockTags.length) {
       currentBlockTag.inBlockTags = [];
+    } else {
+      unClosedTags = [];
     }
   }
 
@@ -107,7 +115,7 @@ export function convert(template: string, options?: Options): string {
       openTag();
     }
 
-    if (currentBlockTag.inBlockTags.length) {
+    if (currentBlockTag && currentBlockTag.inBlockTags.length) {
       closeTags();
     }
 
@@ -127,6 +135,9 @@ export function convert(template: string, options?: Options): string {
     switch (char) {
       case ' ':
         break;
+      case '#':
+        state = STATE.IS_PARTIAL_TEMPLATE;
+        break;
       case '"':
         state = STATE.IS_VALUE;
         break;
@@ -142,7 +153,10 @@ export function convert(template: string, options?: Options): string {
           setTagName();
         }
 
-        openTag();
+        if (tag.name) {
+          openTag();
+        }
+
         closeCurrentTag();
         break;
       case '(':
@@ -263,8 +277,40 @@ export function convert(template: string, options?: Options): string {
     }
   }
 
+  let partialName = '';
+
+  function handlePartialTemplate(char: string) {
+    if (!partials || !partials?.length) {
+      throw Error('Import expression is required to use template');
+    }
+
+    switch (char) {
+      case '{':
+        break;
+      case '}': {
+        const partial = partials.find((partial) => partial.length && partial[0] === partialName);
+        const template = partial?.[1];
+
+        if (!template) {
+          throw Error(`${partialName} is invalid template`);
+        }
+
+        currentStr = partialName;
+        tag.template = template;
+        state = STATE.IS_TAG_NAME;
+        break;
+      }
+      default:
+        partialName += char;
+    }
+  }
+
   for (let i = 0, len = template.length; i < len; i += 1) {
     const char = template[i];
+
+    if (char === '\r') {
+      continue;
+    }
 
     if (char === '@' && template[i + 1] === '{') {
       isKey = true;
@@ -278,13 +324,15 @@ export function convert(template: string, options?: Options): string {
     }
 
     if (state === STATE.IS_TAG_NAME) {
-      handleTagName(char, template[i - 1] ? template[i - 1] : template[i - 2]);
+      handleTagName(char, (template[i - 1] && template[i - 1] !== '\r') ? template[i - 1] : template[i - 2]);
     } else if (state === STATE.IS_ATTR_NAME) {
       handleAttrName(char);
     } else if (state === STATE.IS_ATTR_VALUE) {
       handleAttrValue(char);
     } else if (state === STATE.IS_VALUE) {
       handleValue(char);
+    } else if (state === STATE.IS_PARTIAL_TEMPLATE) {
+      handlePartialTemplate(char);
     }
   }
 

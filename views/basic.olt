@@ -1,5 +1,4 @@
-!DOCTYPE(html)
 html : {
-  head: title: basic!
+  head: title: "basic!"
   body: section: article: h1: "This is basic template"
 }
