@@ -5,7 +5,7 @@ import render from '../lib/render';
 
 describe('basic template', () => {
   it('should render a basic template', () => {
-    const templatePath = path.join(__dirname, 'views', 'basic.olt');
+    const templatePath = path.join(__dirname, 'views', 'basic.olv');
     const result = render(templatePath);
 
     expect(result).to.equal(
@@ -25,7 +25,7 @@ describe('basic template', () => {
   });
 
   it('should throw error when template path is wrong', () => {
-    const templatePath = path.join(__dirname, 'views', 'notExist.olt');
+    const templatePath = path.join(__dirname, 'views', 'notExist.olv');
 
     expect(() => render(templatePath)).to.throw('Invalid template path');
   });
@@ -33,7 +33,7 @@ describe('basic template', () => {
 
 describe('template including options', () => {
   it('should render a template including options', () => {
-    const templatePath = path.join(__dirname, 'views', 'includeOptions.olt');
+    const templatePath = path.join(__dirname, 'views', 'includeOptions.olv');
     const result = render(templatePath, { title: 'This is basic template' });
 
     expect(result).to.equal(
@@ -55,7 +55,7 @@ describe('template including options', () => {
 
 describe('template including partial template', () => {
   it('should render a template including partial template', () => {
-    const templatePath = path.join(__dirname, 'views', 'includePartial.olt');
+    const templatePath = path.join(__dirname, 'views', 'includePartial.olv');
     const result = render(templatePath);
 
     expect(result).to.equal(
@@ -79,7 +79,7 @@ describe('template including partial template', () => {
   });
 
   it('should render a template including partial with option', () => {
-    const templatePath = path.join(__dirname, 'views', 'includePartialWithOption.olt');
+    const templatePath = path.join(__dirname, 'views', 'includePartialWithOption.olv');
     const result = render(templatePath);
 
     expect(result).to.equal(
@@ -105,7 +105,7 @@ describe('template including partial template', () => {
 
 describe('template including options and partial template', () => {
   it('should render a template including nested options', () => {
-    const templatePath = path.join(__dirname, 'views', 'includePartialAndOption.olt');
+    const templatePath = path.join(__dirname, 'views', 'includePartialAndOption.olv');
     const result = render(templatePath, { article: { title: 'partial', content: 'This is an article about partial.' } });
 
     expect(result).to.equal(

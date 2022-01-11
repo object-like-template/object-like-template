@@ -4,7 +4,10 @@
     "esModuleInterop": true,
     "target": "esnext",
     "declaration": true,
-    "outDir": "/dist",
+    "outDir": "dist",
     "strict": true
-  }
+  },
+  "include": [
+    "lib/**/*.ts"
+  ]
 }
