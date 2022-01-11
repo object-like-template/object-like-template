@@ -10,18 +10,22 @@ type Attribute = [string, string];
 interface Tag {
   name: string,
   attributes: Attribute[],
+  inBlockTags: Tag[],
 }
 
 export function convert(template: string, options?: Options): string {
   const unClosedTags: Tag[] = [];
-  const initialTag: Tag = {
-    name: '',
-    attributes: [],
-  };
+  const blockTags: Tag[] = [];
 
   let state: string = STATE.IS_TAG_NAME;
-  let tag: Tag = { ...initialTag };
+  let tag: Tag = {
+    name: '',
+    attributes: [],
+    inBlockTags: [],
+  };
   let attribute: Attribute = ['', ''];
+  let isKey = false;
+  let hasDefault = false;
   let currentStr = '';
   let result = '';
 
@@ -46,18 +50,27 @@ export function convert(template: string, options?: Options): string {
     currentStr = '';
   }
 
+  function resetTag() {
+    tag = {
+      name: '',
+      attributes: [],
+      inBlockTags: [],
+    };
+  }
+
   function openTag() {
     const { name, attributes } = tag;
-    const attributesStr = attributes.map(([name, value]) => `${name}="${value}"`).join('');
+    const attributesStr = attributes.map(([name, value]) => `${name}="${value}"`).join(' ');
+    const currentBlockTag = blockTags[blockTags.length - 1];
 
     if (singletons.has(name)) {
       result += attributesStr ? `<${name} ${attributesStr} />` : `<${name} />`;
     } else {
       result += attributesStr ? `<${name} ${attributesStr}>` : `<${name}>`;
-      unClosedTags.push(tag);
+      (blockTags.length ? currentBlockTag.inBlockTags : unClosedTags).push(tag);
     }
 
-    tag = { ...initialTag };
+    resetTag();
   }
 
   function addValue() {
@@ -65,14 +78,49 @@ export function convert(template: string, options?: Options): string {
     currentStr = '';
   }
 
-  function closeCurrentTag() {
-    const closeTag = unClosedTags.pop();
+  function closeCurrentTag(isBlockTag? : true) {
+    const currentBlockTag = blockTags[blockTags.length - 1];
+    const currentUncloseTags = blockTags.length ? currentBlockTag.inBlockTags : unClosedTags;
+    const closeTag = (isBlockTag ? blockTags : currentUncloseTags).pop();
+
     result += `</${closeTag?.name}>`;
   }
 
   function closeTags() {
-    const closeTags = unClosedTags.map(({ name }) => `</${name}>`);
+    const currentBlockTag = blockTags[blockTags.length - 1];
+    const closeTags = (blockTags.length ? currentBlockTag.inBlockTags : unClosedTags).map(({ name }) => `</${name}>`);
     result += closeTags.reverse().join('');
+
+    if (blockTags.length) {
+      currentBlockTag.inBlockTags = [];
+    }
+  }
+
+  function closeBlock() {
+    const currentBlockTag = blockTags[blockTags.length - 1];
+
+    if (currentStr || state === STATE.IS_TAG_NAME) {
+      setTagName();
+    }
+
+    if (tag.name) {
+      openTag();
+    }
+
+    if (currentBlockTag.inBlockTags.length) {
+      closeTags();
+    }
+
+    closeCurrentTag(true);
+    blockTags.pop();
+  }
+
+  function openBlock() {
+    const currentTag = unClosedTags.pop();
+
+    if (currentTag) {
+      blockTags.push(currentTag);
+    }
   }
 
   function handleTagName(char: string, prevChar: string) {
@@ -110,10 +158,16 @@ export function convert(template: string, options?: Options): string {
           openTag();
         }
 
-        if (prevChar !== ':' && prevChar !== ',') {
+        if (prevChar !== ':' && prevChar !== ',' && prevChar !== '{') {
           closeTags();
         }
 
+        break;
+      case '{':
+        openBlock();
+        break;
+      case '}':
+        closeBlock();
         break;
       default:
         currentStr += char;
@@ -167,8 +221,61 @@ export function convert(template: string, options?: Options): string {
     }
   }
 
+  let count = 0;
+  let key = '';
+  let defaultValue = '';
+
+  function handleKey(char: string) {
+    if (char === '=') {
+      hasDefault = true;
+      count = 0;
+
+      return;
+    }
+
+    if (hasDefault) {
+      if (char === '"') {
+        count += 1;
+        hasDefault = count < 2;
+      } else if (char !== ' ') {
+        defaultValue += char;
+      }
+
+      return;
+    }
+
+    if (char === '"' || char === ')') {
+      throw new SyntaxError('Unclosed variable');
+    }
+
+    if (char === '}') {
+      isKey = false;
+
+      const value = options?.[key] || defaultValue;
+
+      if (value) {
+        currentStr += value;
+      }
+
+      key = '';
+    } else {
+      key += char;
+    }
+  }
+
   for (let i = 0, len = template.length; i < len; i += 1) {
     const char = template[i];
+
+    if (char === '@' && template[i + 1] === '{') {
+      isKey = true;
+      i += 1;
+      continue;
+    }
+
+    if (isKey) {
+      handleKey(char);
+      continue;
+    }
 
     if (state === STATE.IS_TAG_NAME) {
       handleTagName(char, template[i - 1] ? template[i - 1] : template[i - 2]);
@@ -181,6 +288,10 @@ export function convert(template: string, options?: Options): string {
     }
   }
 
+  if (currentStr || state === STATE.IS_TAG_NAME) {
+    setTagName();
+  }
+
   if (tag.name) {
     openTag();
   }
@@ -191,6 +302,10 @@ export function convert(template: string, options?: Options): string {
 
   if (state === STATE.IS_VALUE) {
     throw new SyntaxError('Text has to be in double quotes');
+  }
+
+  if (blockTags.length) {
+    throw new SyntaxError('Unclosed Block (need “}”)');
   }
 
   return result;

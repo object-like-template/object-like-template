@@ -5,6 +5,4 @@ const STATE = {
   IS_VALUE: 'isValue',
 } as const;
 
-// type STATE = typeof STATE[keyof typeof STATE];
-
 export default STATE;
