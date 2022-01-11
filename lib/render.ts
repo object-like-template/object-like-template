@@ -16,6 +16,43 @@ function importPartial(partialPath: string, basePath: string): string {
   return template;
 }
 
+function createOptionRegExp(key: string) {
+  return RegExp(`@{${key}}`, 'g');
+}
+
+function parseTemplate(template: string, basePath: string) {
+  const regPartial = /#\{(.+?)\}\((.+?)\)|#\{(.+?)\}/g;
+  const result = template.replace(regPartial, (_, optionPartialPath, options, basicPartialPath) => {
+    let partialTemplate = importPartial(optionPartialPath || basicPartialPath, basePath);
+
+    if (optionPartialPath) {
+      const partialOptions = options.split(',').map((optionStr: string): [string, string] => {
+        const reg = /(.+?)="(.+?)"/;
+        const result = reg.exec(optionStr);
+        let key = '';
+        let value = '';
+
+        if (result) {
+          [_, key, value] = result;
+        }
+
+        return [key.trim(), value.trim()];
+      }, {});
+
+      partialOptions.forEach((option: [string, string]) => {
+        const [key, value] = option;
+        const optionReg = createOptionRegExp(key);
+
+        partialTemplate = partialTemplate.replace(optionReg, value);
+      });
+    }
+
+    return partialTemplate;
+  }).replace(/\r/g, '');
+
+  return result;
+}
+
 export default function render(templatePath: string, options?: Options): string {
   let template = '';
   const fullTemplatePath = path.join(__dirname, templatePath);
@@ -26,11 +63,5 @@ export default function render(templatePath: string, options?: Options): string 
     throw new Error('Invalid template path');
   }
 
-  const reg = /#\{(\S*)\}/g;
-  const result = template.replace(reg, (_, partialPath) => {
-    const partialTemplate = importPartial(partialPath, fullTemplatePath);
-    return partialTemplate;
-  }).replace(/\r/g, '');
-
-  return convert(result, options);
+  return convert(parseTemplate(template, fullTemplatePath), options);
 }

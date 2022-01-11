@@ -51,7 +51,7 @@ describe('template including options', () => {
   });
 });
 
-describe.only('template including partial template', () => {
+describe('template including partial template', () => {
   it('should render a template including partial template', () => {
     const templatePath = '../views/includePartial.olt';
     const result = render(templatePath);
