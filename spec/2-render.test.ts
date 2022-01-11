@@ -1,17 +1,16 @@
 import { expect } from 'chai';
 import render from '../lib/render';
 
-describe.skip('basic template', () => {
+describe('basic template', () => {
   it('should render a basic template', () => {
     const templatePath = '../views/basic.olt';
     const result = render(templatePath);
 
     expect(result).to.equal(
-      '<!DOCTYPE html>'
-        + '<html>'
-          + '<head>'
-            + '<title>basic</title>'
-          + '</head>'
+      '<html>'
+        + '<head>'
+          + '<title>basic!</title>'
+        + '</head>'
         + '<body>'
           + '<section>'
             + '<article>'
@@ -26,21 +25,20 @@ describe.skip('basic template', () => {
   it('should throw error when template path is wrong', () => {
     const templatePath = '../views/notExist.olt';
 
-    expect(render(templatePath)).to.throw('invalid path');
+    expect(() => render(templatePath)).to.throw('Invalid template path');
   });
 });
 
-describe.skip('template including options', () => {
+describe('template including options', () => {
   it('should render a template including options', () => {
-    const templatePath = '../views/includeOption.olt';
+    const templatePath = '../views/includeOptions.olt';
     const result = render(templatePath, { title: 'This is basic template' });
 
     expect(result).to.equal(
-      '<!DOCTYPE html>'
-        + '<html>'
-          + '<head>'
-            + '<title>basic</title>'
-          + '</head>'
+      '<html>'
+        + '<head>'
+          + '<title>basic!</title>'
+        + '</head>'
         + '<body>'
           + '<section>'
             + '<article>'
@@ -53,17 +51,16 @@ describe.skip('template including options', () => {
   });
 });
 
-describe.skip('template including partial template', () => {
+describe('template including partial template', () => {
   it('should render a template including partial template', () => {
-    const templatePath = '../views/includePartial';
+    const templatePath = '../views/includePartial.olt';
     const result = render(templatePath);
 
     expect(result).to.equal(
-      '<!DOCTYPE html>'
-        + '<html>'
-          + '<head>'
-            + '<title>basic</title>'
-          + '</head>'
+      '<html>'
+        + '<head>'
+          + '<title>basic!</title>'
+        + '</head>'
         + '<body>'
           + '<section>'
             + '<article>'
@@ -80,15 +77,14 @@ describe.skip('template including partial template', () => {
   });
 
   it('should render a template including partial with option', () => {
-    const templatePath = '../views/includePartial';
+    const templatePath = '../views/includePartialWithOption.olt';
     const result = render(templatePath);
 
     expect(result).to.equal(
-      '<!DOCTYPE html>'
-        + '<html>'
-          + '<head>'
-            + '<title>basic</title>'
-          + '</head>'
+      '<html>'
+        + '<head>'
+          + '<title>basic!</title>'
+        + '</head>'
         + '<body>'
           + '<section>'
             + '<article>'
@@ -105,17 +101,16 @@ describe.skip('template including partial template', () => {
   });
 });
 
-describe.skip('template including options and partial template', () => {
+describe('template including options and partial template', () => {
   it('should render a template including nested options', () => {
-    const templatePath = '../views/includeOption.olt';
+    const templatePath = '../views/includePartialAndOption.olt';
     const result = render(templatePath, { article: { title: 'partial', content: 'This is an article about partial.' } });
 
     expect(result).to.equal(
-      '<!DOCTYPE html>'
-        + '<html>'
-          + '<head>'
-            + '<title>basic</title>'
-          + '</head>'
+      '<html>'
+        + '<head>'
+          + '<title>basic!</title>'
+        + '</head>'
         + '<body>'
           + '<section>'
             + '<article>'

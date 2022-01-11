@@ -14,9 +14,9 @@ interface Tag {
 }
 
 export function convert(template: string, options?: Options): string {
-  const unClosedTags: Tag[] = [];
   const blockTags: Tag[] = [];
 
+  let unClosedTags: Tag[] = [];
   let state: string = STATE.IS_TAG_NAME;
   let tag: Tag = {
     name: '',
@@ -88,11 +88,27 @@ export function convert(template: string, options?: Options): string {
 
   function closeTags() {
     const currentBlockTag = blockTags[blockTags.length - 1];
+
+    if (!blockTags.length && !unClosedTags.length) {
+      return;
+    }
+
     const closeTags = (blockTags.length ? currentBlockTag.inBlockTags : unClosedTags).map(({ name }) => `</${name}>`);
     result += closeTags.reverse().join('');
 
     if (blockTags.length) {
       currentBlockTag.inBlockTags = [];
+    } else {
+      unClosedTags = [];
+    }
+  }
+
+  function openBlock() {
+    const currentBlockTag = blockTags[blockTags.length - 1];
+    const currentTag = (blockTags.length ? currentBlockTag.inBlockTags : unClosedTags).pop();
+
+    if (currentTag) {
+      blockTags.push(currentTag);
     }
   }
 
@@ -107,20 +123,11 @@ export function convert(template: string, options?: Options): string {
       openTag();
     }
 
-    if (currentBlockTag.inBlockTags.length) {
+    if (currentBlockTag && currentBlockTag.inBlockTags.length) {
       closeTags();
     }
 
     closeCurrentTag(true);
-    blockTags.pop();
-  }
-
-  function openBlock() {
-    const currentTag = unClosedTags.pop();
-
-    if (currentTag) {
-      blockTags.push(currentTag);
-    }
   }
 
   function handleTagName(char: string, prevChar: string) {
@@ -142,7 +149,10 @@ export function convert(template: string, options?: Options): string {
           setTagName();
         }
 
-        openTag();
+        if (tag.name) {
+          openTag();
+        }
+
         closeCurrentTag();
         break;
       case '(':

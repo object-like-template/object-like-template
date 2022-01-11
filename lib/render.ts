@@ -1,5 +1,18 @@
-import { convert, Options } from './convert';
+import fs from 'fs';
+import path from 'path';
 
-export default function render(template: string, options?: Options): string {
-  return convert(template);
+import { convert, Options } from './convert';
+import parse from './parse';
+
+export default function render(templatePath: string, options?: Options): string {
+  let template = '';
+  const fullTemplatePath = path.join(__dirname, templatePath);
+
+  try {
+    template = fs.readFileSync(fullTemplatePath).toString();
+  } catch (err) {
+    throw new Error('Invalid template path');
+  }
+
+  return convert(parse(template, fullTemplatePath), options);
 }
