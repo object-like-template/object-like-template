@@ -30,6 +30,7 @@
     ],
     "linebreak-style": "off",
     "no-shadow": "off",
-    "no-continue": "off"
+    "no-continue": "off",
+    "no-param-reassign": "off"
   }
 }
