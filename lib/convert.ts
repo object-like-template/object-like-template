@@ -88,6 +88,11 @@ export function convert(template: string, options?: Options): string {
 
   function closeTags() {
     const currentBlockTag = blockTags[blockTags.length - 1];
+
+    if (!blockTags.length && !unClosedTags.length) {
+      return;
+    }
+
     const closeTags = (blockTags.length ? currentBlockTag.inBlockTags : unClosedTags).map(({ name }) => `</${name}>`);
     result += closeTags.reverse().join('');
 
@@ -95,6 +100,15 @@ export function convert(template: string, options?: Options): string {
       currentBlockTag.inBlockTags = [];
     } else {
       unClosedTags = [];
+    }
+  }
+
+  function openBlock() {
+    const currentBlockTag = blockTags[blockTags.length - 1];
+    const currentTag = (blockTags.length ? currentBlockTag.inBlockTags : unClosedTags).pop();
+
+    if (currentTag) {
+      blockTags.push(currentTag);
     }
   }
 
@@ -114,15 +128,6 @@ export function convert(template: string, options?: Options): string {
     }
 
     closeCurrentTag(true);
-    blockTags.pop();
-  }
-
-  function openBlock() {
-    const currentTag = unClosedTags.pop();
-
-    if (currentTag) {
-      blockTags.push(currentTag);
-    }
   }
 
   function handleTagName(char: string, prevChar: string) {
@@ -271,10 +276,6 @@ export function convert(template: string, options?: Options): string {
   for (let i = 0, len = template.length; i < len; i += 1) {
     const char = template[i];
 
-    if (char === '\r') {
-      continue;
-    }
-
     if (char === '@' && template[i + 1] === '{') {
       isKey = true;
       i += 1;
@@ -287,7 +288,7 @@ export function convert(template: string, options?: Options): string {
     }
 
     if (state === STATE.IS_TAG_NAME) {
-      handleTagName(char, (template[i - 1] && template[i - 1] !== '\r') ? template[i - 1] : template[i - 2]);
+      handleTagName(char, template[i - 1] ? template[i - 1] : template[i - 2]);
     } else if (state === STATE.IS_ATTR_NAME) {
       handleAttrName(char);
     } else if (state === STATE.IS_ATTR_VALUE) {
