@@ -5,18 +5,15 @@ export interface Options {
   [key: string]: string | Options,
 }
 
-export type Partial = [string, string];
-
 type Attribute = [string, string];
 
 interface Tag {
   name: string,
   attributes: Attribute[],
   inBlockTags: Tag[],
-  template?: string,
 }
 
-export function convert(template: string, options?: Options, partials?: Partial[]): string {
+export function convert(template: string, options?: Options): string {
   const blockTags: Tag[] = [];
 
   let unClosedTags: Tag[] = [];
@@ -66,10 +63,7 @@ export function convert(template: string, options?: Options, partials?: Partial[
     const attributesStr = attributes.map(([name, value]) => `${name}="${value}"`).join(' ');
     const currentBlockTag = blockTags[blockTags.length - 1];
 
-    if (tag.template) {
-      const options = attributes.reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-      result += convert(tag.template, options);
-    } else if (singletons.has(name)) {
+    if (singletons.has(name)) {
       result += attributesStr ? `<${name} ${attributesStr} />` : `<${name} />`;
     } else {
       result += attributesStr ? `<${name} ${attributesStr}>` : `<${name}>`;
@@ -134,9 +128,6 @@ export function convert(template: string, options?: Options, partials?: Partial[
   function handleTagName(char: string, prevChar: string) {
     switch (char) {
       case ' ':
-        break;
-      case '#':
-        state = STATE.IS_PARTIAL_TEMPLATE;
         break;
       case '"':
         state = STATE.IS_VALUE;
@@ -277,34 +268,6 @@ export function convert(template: string, options?: Options, partials?: Partial[
     }
   }
 
-  let partialName = '';
-
-  function handlePartialTemplate(char: string) {
-    if (!partials || !partials?.length) {
-      throw Error('Import expression is required to use template');
-    }
-
-    switch (char) {
-      case '{':
-        break;
-      case '}': {
-        const partial = partials.find((partial) => partial.length && partial[0] === partialName);
-        const template = partial?.[1];
-
-        if (!template) {
-          throw Error(`${partialName} is invalid template`);
-        }
-
-        currentStr = partialName;
-        tag.template = template;
-        state = STATE.IS_TAG_NAME;
-        break;
-      }
-      default:
-        partialName += char;
-    }
-  }
-
   for (let i = 0, len = template.length; i < len; i += 1) {
     const char = template[i];
 
@@ -331,8 +294,6 @@ export function convert(template: string, options?: Options, partials?: Partial[
       handleAttrValue(char);
     } else if (state === STATE.IS_VALUE) {
       handleValue(char);
-    } else if (state === STATE.IS_PARTIAL_TEMPLATE) {
-      handlePartialTemplate(char);
     }
   }
 

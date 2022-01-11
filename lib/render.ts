@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
-import { convert, Options, Partial } from './convert';
+import { convert, Options } from './convert';
 
-function importPartial(line: string, basePath: string): Partial {
+function importPartial(line: string, basePath: string): string {
   const [importExpression, templateName, from, templatePath] = line.split(' ');
   const trimmedTemplatePath = templatePath.trim().slice(1, templatePath.length - 3);
   let template = '';
@@ -18,11 +18,10 @@ function importPartial(line: string, basePath: string): Partial {
     throw new Error(`${trimmedTemplatePath} is Invalid partial template path`);
   }
 
-  return [templateName, template];
+  return template;
 }
 
 export default function render(templatePath: string, options?: Options): string {
-  const partialTemplates: [string, string][] = [];
   let template = '';
 
   try {
@@ -31,20 +30,5 @@ export default function render(templatePath: string, options?: Options): string 
     throw new Error('Invalid template path');
   }
 
-  if (template.startsWith('import')) {
-    const templateLines = template.split('\n');
-
-    for (let i = 0, len = templateLines.length; i < len; i += 1) {
-      const line = templateLines[i];
-
-      if (line.startsWith('import')) {
-        partialTemplates.push(importPartial(line, path.join(__dirname, templatePath)));
-      } else {
-        template = templateLines.slice(i).join('\n');
-        break;
-      }
-    }
-  }
-
-  return convert(template, options, partialTemplates);
+  return convert(template, options);
 }
