@@ -2,16 +2,15 @@ import express from 'express';
 import request from 'supertest';
 import path from 'path';
 import { expect } from 'chai';
-
-import olt from '../lib/engine';
+import olv from '../lib/engine';
 
 const app = express();
 
 describe('express view engine', () => {
   before(() => {
-    app.engine('olt', olt);
+    app.engine('olv', olv);
     app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'olt');
+    app.set('view engine', 'olv');
   });
 
   it('should render basic template', (done) => {

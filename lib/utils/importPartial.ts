@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default function importPartial(partialPath: string, basePath: string): string {
-  const fullPartialPath = `${partialPath}.olt`;
+  const fullPartialPath = `${partialPath}.olv`;
   let template = '';
 
   try {
