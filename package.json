@@ -1,6 +1,6 @@
 {
   "name": "olv",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "View template engine like object",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -51,8 +51,5 @@
     "supertest": "^6.2.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
-  },
-  "dependencies": {
-    "olv": "^1.0.3"
   }
 }
