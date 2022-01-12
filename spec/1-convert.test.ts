@@ -106,6 +106,30 @@ describe('multiple tags', () => {
       + '</html>',
     );
   });
+
+  it('should convert parent and singleton tag and sibling tag without line-break', () => {
+    const template = 'body: input(type="text"), p: "I\'m paragraph"\n';
+    const result = convert(template);
+
+    expect(result).to.equal(
+      '<body>'
+        + '<input type="text" />'
+        + '<p>I\'m paragraph</p>'
+      + '</body>',
+    );
+  });
+
+  it('should convert parent and text and child tag without line-break', () => {
+    const template = 'body: "I\'m text", p: "I\'m paragraph"\n';
+    const result = convert(template);
+
+    expect(result).to.equal(
+      '<body>'
+        + 'I\'m text'
+        + '<p>I\'m paragraph</p>'
+      + '</body>',
+    );
+  });
 });
 
 describe('block tags', () => {
