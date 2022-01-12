@@ -1,6 +1,6 @@
 {
   "name": "olv",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "View template engine like object",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
