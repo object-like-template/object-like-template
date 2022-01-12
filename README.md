@@ -117,5 +117,5 @@ html : {
 ```
 
 ## Release note
-`1.0.4` : Fix close parent when use "," after text or a singelton tag
+`1.0.5` : Fix close parent when use "," after text or a singelton tag
 
