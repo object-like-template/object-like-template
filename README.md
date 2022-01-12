@@ -115,3 +115,7 @@ html : {
   </body>
 </html>
 ```
+
+## Release note
+`1.0.4` : Fix close parent when use "," after text or a singelton tag
+
