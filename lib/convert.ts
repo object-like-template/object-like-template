@@ -18,6 +18,11 @@ export function convert(template: string, options?: Options): string {
 
   let unClosedTags: Tag[] = [];
   let state: string = STATE.IS_TAG_NAME;
+  let prevTag: Tag = {
+    name: '',
+    attributes: [],
+    inBlockTags: [],
+  };
   let tag: Tag = {
     name: '',
     attributes: [],
@@ -60,6 +65,13 @@ export function convert(template: string, options?: Options): string {
 
   function openTag() {
     const { name, attributes } = tag;
+
+    prevTag = tag;
+
+    if (!name) {
+      return;
+    }
+
     const attributesStr = attributes.map(([name, value]) => `${name}="${value}"`).join(' ');
     const currentBlockTag = blockTags[blockTags.length - 1];
 
@@ -76,11 +88,17 @@ export function convert(template: string, options?: Options): string {
   function addValue() {
     result += currentStr;
     currentStr = '';
+    openTag();
   }
 
   function closeCurrentTag(isBlockTag? : true) {
     const currentBlockTag = blockTags[blockTags.length - 1];
     const currentUncloseTags = blockTags.length ? currentBlockTag.inBlockTags : unClosedTags;
+
+    if (!isBlockTag && prevTag !== currentUncloseTags[currentUncloseTags.length - 1]) {
+      return;
+    }
+
     const closeTag = (isBlockTag ? blockTags : currentUncloseTags).pop();
 
     result += `</${closeTag?.name}>`;
