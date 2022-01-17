@@ -3,9 +3,9 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "esnext",
-    "declaration": true,
     "outDir": "dist",
-    "strict": true
+    "sourceMap": true,
+    "strict": true,
   },
   "include": [
     "lib/**/*.ts"

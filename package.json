@@ -1,6 +1,6 @@
 {
   "name": "olv",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "View template engine like object",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
     "view"
   ],
   "scripts": {
-    "build": "tsc -p .",
+    "build": "webpack --mode=production",
     "test": "mocha -r ts-node/register spec/**/*.test.ts",
     "prepare": "husky install",
     "lint-staged": "lint-staged"
@@ -49,7 +49,9 @@
     "lint-staged": "^12.1.5",
     "mocha": "^9.1.3",
     "supertest": "^6.2.0",
+    "ts-loader": "^9.2.6",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "webpack-cli": "^4.9.1"
   }
 }

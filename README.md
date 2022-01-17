@@ -121,3 +121,4 @@ html : {
 
 `1.0.6` : Clear Dependency
 
+`1.0.7` : Minify Package
